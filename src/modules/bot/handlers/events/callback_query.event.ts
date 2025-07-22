@@ -58,66 +58,50 @@ export const callbackQueryEvent = (
         return;
       }
 
-      let newText = '';
-      let newCaption = '';
-      const parseMode: 'HTML' | undefined = 'HTML';
+      if (action === 'cancel_emergency') {
+        // Agar bekor qilinsa, guruhdagi xabarni o'chiramiz
+        await bot.api.deleteMessage(groupId, parseInt(groupMessageId, 10));
+      } else if (action === 'confirm_emergency') {
+        // Agar tasdiqlansa, foydalanuvchi ma'lumotlari bilan xabarni tahrirlaymiz
+        const emergencyUser = updatedEmergency.user as any;
+        if (!emergencyUser) {
+          throw new Error(
+            "Murojaat uchun foydalanuvchi ma'lumotlari topilmadi.",
+          );
+        }
 
-      if (updatedEmergency.message_type === 'text') {
-        newText = `${statusText}\n\n${updatedEmergency.message_content}`;
-      } else if (
-        updatedEmergency.message_type === 'photo' ||
-        updatedEmergency.message_type === 'video' ||
-        updatedEmergency.message_type === 'document' ||
-        updatedEmergency.message_type === 'audio' ||
-        updatedEmergency.message_type === 'voice' ||
-        updatedEmergency.message_type === 'animation'
-      ) {
-        newCaption = `${statusText}\n\n${updatedEmergency.message_content || ''}`;
-      } else {
-        // For messages without text or caption (e.g., stickers, voice messages without caption)
-        // We will just send the status text and then edit the message without modification.
-        await bot.api.editMessageCaption(
-          groupId,
-          parseInt(groupMessageId, 10),
-          {
-            caption: statusText,
-            parse_mode: 'HTML',
-          },
-        );
-        await ctx.answerCallbackQuery({
-          text: `Murojaat ${action === 'confirm_emergency' ? 'tasdiqlandi' : 'bekor qilindi'}!`,
-        });
-        await ctx.editMessageText(
-          `Murojaatingiz ${action === 'confirm_emergency' ? 'tasdiqlandi' : 'bekor qilindi'}.`,
-        );
-        return;
-      }
+        const userInfo = `<b>Foydalanuvchi ma'lumotlari:</b>
+Ism: ${emergencyUser.full_name}
+Telegram ID: <code>${emergencyUser.telegram_id}</code>
+${emergencyUser.username ? `Username: @${emergencyUser.username}` : ''}
+`;
 
-      if (updatedEmergency.message_type === 'text') {
-        await bot.api.editMessageText(
-          groupId,
-          parseInt(groupMessageId, 10),
-          newText,
-          {
-            parse_mode: parseMode,
-          },
-        );
-      } else if (
-        updatedEmergency.message_type === 'photo' ||
-        updatedEmergency.message_type === 'video' ||
-        updatedEmergency.message_type === 'document' ||
-        updatedEmergency.message_type === 'audio' ||
-        updatedEmergency.message_type === 'voice' ||
-        updatedEmergency.message_type === 'animation'
-      ) {
-        await bot.api.editMessageCaption(
-          groupId,
-          parseInt(groupMessageId, 10),
-          {
-            caption: newCaption,
-            parse_mode: parseMode,
-          },
-        );
+        const messageText = `
+${statusText}
+
+${updatedEmergency.message_content || ''}`;
+
+        if (updatedEmergency.message_type === 'text') {
+          await bot.api.editMessageText(
+            groupId,
+            parseInt(groupMessageId, 10),
+            `${userInfo}
+<b>Xabar:</b>
+${messageText}`,
+            { parse_mode: 'HTML' },
+          );
+        } else {
+          await bot.api.editMessageCaption(
+            groupId,
+            parseInt(groupMessageId, 10),
+            {
+              caption: `${userInfo}
+<b>Xabar:</b>
+${messageText}`,
+              parse_mode: 'HTML',
+            },
+          );
+        }
       }
 
       await ctx.answerCallbackQuery({
@@ -127,7 +111,10 @@ export const callbackQueryEvent = (
       // Delete user's original message
       if (updatedEmergency.user_message_id) {
         try {
-          await bot.api.deleteMessage(ctx.from.id, updatedEmergency.user_message_id);
+          await bot.api.deleteMessage(
+            ctx.from.id,
+            updatedEmergency.user_message_id,
+          );
         } catch (deleteError) {
           console.error('Failed to delete user message:', deleteError);
         }
@@ -136,17 +123,29 @@ export const callbackQueryEvent = (
       // Delete bot's confirmation message
       if (ctx.callbackQuery.message) {
         try {
-          await bot.api.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id);
+          await bot.api.deleteMessage(
+            ctx.chat.id,
+            ctx.callbackQuery.message.message_id,
+          );
         } catch (deleteError) {
-          console.error('Failed to delete bot confirmation message:', deleteError);
+          console.error(
+            'Failed to delete bot confirmation message:',
+            deleteError,
+          );
         }
       }
 
       // Reprompt user for new message
       user.action = 'awaiting_emergency_message';
-      await userService.update(user.telegram_id, { action: 'awaiting_emergency_message' });
-      const sentMessage = await ctx.reply('Iltimos, keyingi xabaringizni yuboring (matn, rasm, video va hokazo).');
-      await userService.update(user.telegram_id, { action_message_id: sentMessage.message_id });
+      await userService.update(user.telegram_id, {
+        action: 'awaiting_emergency_message',
+      });
+      const sentMessage = await ctx.reply(
+        'Iltimos, keyingi xabaringizni yuboring (matn, rasm, video va hokazo).',
+      );
+      await userService.update(user.telegram_id, {
+        action_message_id: sentMessage.message_id,
+      });
     } catch (error) {
       console.error('Callback query xatoligi:', error);
       await ctx.answerCallbackQuery({
