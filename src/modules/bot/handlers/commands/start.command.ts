@@ -1,7 +1,6 @@
 import { Bot, Keyboard } from 'grammy';
 import { UserService } from 'src/modules/user/user.service';
 import { UserStatus } from 'src/modules/user/schemas/user.schema';
-import { REPORT_BUTTON_TEXT } from '../../constants';
 
 export const startCommand = (bot: Bot, userService: UserService) => {
   bot.command('start', async (ctx) => {
