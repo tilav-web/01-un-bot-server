@@ -1,4 +1,4 @@
-import { Bot, Keyboard } from 'grammy';
+import { Bot } from 'grammy';
 import { UserService } from 'src/modules/user/user.service';
 import { UserStatus } from 'src/modules/user/schemas/user.schema';
 
@@ -36,13 +36,11 @@ export const startCommand = (bot: Bot, userService: UserService) => {
       }
     }
 
-    await ctx.reply(
-      'Assalomu alaykum! Bu bot orqali siz noqonuniy harakatlar haqida xabar berishingiz yoki maʼlumotlarni aniqlashtirishingiz mumkin.',
-    );
-    console.log('Welcome message sent.');
     updatedUser.action = 'awaiting_emergency_message';
     await updatedUser.save();
-    const sentMessage = await ctx.reply('Iltimos, xabaringizni yuboring (matn, rasm, video va hokazo).');
+    const sentMessage = await ctx.reply(
+      'Iltimos, xabaringizni yuboring (matn, rasm, video va hokazo).',
+    );
     updatedUser.action_message_id = sentMessage.message_id;
   });
 };
