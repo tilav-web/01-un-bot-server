@@ -2,8 +2,9 @@ import { Bot } from 'grammy';
 import { UserService } from 'src/modules/user/user.service';
 import { EmergencyService } from 'src/modules/emergency/emergency.service';
 
+import { EmergencyStatus } from 'src/modules/emergency/schemas/emergency.schema';
+
 import { handleEmergencyMessage } from './utils/messages/emergency-handler';
-import { handleReportCommand } from './utils/messages/report-command-handler';
 
 export const messageEvent = (
   bot: Bot,
@@ -11,9 +12,17 @@ export const messageEvent = (
   emergencyService: EmergencyService,
 ) => {
   bot.on('message', async (ctx) => {
+    const user = await userService.findOne(ctx.from.id);
+
+    if (user && user.action !== 'awaiting_emergency_message') {
+      const pendingEmergency = await emergencyService.findPendingEmergencyByUserId(user._id);
+      if (pendingEmergency) {
+        await ctx.reply('Sizda hali tasdiqlanmagan xabar bor. Iltimos, avvalgi xabaringizni tasdiqlang yoki bekor qiling.');
+        return;
+      }
+    }
+
     if (await handleEmergencyMessage(ctx, bot, userService, emergencyService)) {
-      return;
-    } else if (await handleReportCommand(ctx, userService)) {
       return;
     }
   });

@@ -37,14 +37,12 @@ export const startCommand = (bot: Bot, userService: UserService) => {
       }
     }
 
-    const keyboard = new Keyboard().text(REPORT_BUTTON_TEXT).resized();
-
     await ctx.reply(
       'Assalomu alaykum! Bu bot orqali siz noqonuniy harakatlar haqida xabar berishingiz yoki maʼlumotlarni aniqlashtirishingiz mumkin.',
-      {
-        reply_markup: keyboard,
-      },
     );
-    console.log('Welcome message and keyboard sent.');
+    console.log('Welcome message sent.');
+    updatedUser.action = 'awaiting_emergency_message';
+    await updatedUser.save();
+    await ctx.reply('Iltimos, xabaringizni yuboring (matn, rasm, video va hokazo).');
   });
 };

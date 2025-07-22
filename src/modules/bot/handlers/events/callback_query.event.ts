@@ -123,9 +123,29 @@ export const callbackQueryEvent = (
       await ctx.answerCallbackQuery({
         text: `Murojaat ${action === 'confirm_emergency' ? 'tasdiqlandi' : 'bekor qilindi'}!`,
       });
-      await ctx.editMessageText(
-        `Murojaatingiz ${action === 'confirm_emergency' ? 'tasdiqlandi' : 'bekor qilindi'}.`,
-      );
+
+      // Delete user's original message
+      if (updatedEmergency.user_message_id) {
+        try {
+          await bot.api.deleteMessage(ctx.from.id, updatedEmergency.user_message_id);
+        } catch (deleteError) {
+          console.error('Failed to delete user message:', deleteError);
+        }
+      }
+
+      // Delete bot's confirmation message
+      if (ctx.callbackQuery.message) {
+        try {
+          await bot.api.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id);
+        } catch (deleteError) {
+          console.error('Failed to delete bot confirmation message:', deleteError);
+        }
+      }
+
+      // Reprompt user for new message
+      user.action = 'awaiting_emergency_message';
+      await userService.update(user.telegram_id, { action: 'awaiting_emergency_message' });
+      await ctx.reply('Iltimos, keyingi xabaringizni yuboring (matn, rasm, video va hokazo).');
     } catch (error) {
       console.error('Callback query xatoligi:', error);
       await ctx.answerCallbackQuery({

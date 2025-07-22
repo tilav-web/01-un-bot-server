@@ -84,6 +84,10 @@ export class EmergencyService {
     };
   }
 
+  async findPendingEmergencyByUserId(userId: Types.ObjectId): Promise<EmergencyDocument | null> {
+    return this.emergencyModel.findOne({ user: userId, status: EmergencyStatus.PENDING }).exec();
+  }
+
   async updateEmergencyStatus(
     group_message_id: number,
     status: EmergencyStatus,
