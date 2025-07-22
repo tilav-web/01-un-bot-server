@@ -58,48 +58,41 @@ export const callbackQueryEvent = (
         return;
       }
 
-      if (action === 'cancel_emergency') {
-        // Agar bekor qilinsa, guruhdagi xabarni o'chiramiz
-        await bot.api.deleteMessage(groupId, parseInt(groupMessageId, 10));
-      } else if (action === 'confirm_emergency') {
-        // Agar tasdiqlansa, foydalanuvchi ma'lumotlari bilan xabarni tahrirlaymiz
-        const emergencyUser = updatedEmergency.user as any;
-        if (!emergencyUser) {
-          throw new Error(
-            "Murojaat uchun foydalanuvchi ma'lumotlari topilmadi.",
-          );
-        }
+      // Foydalanuvchi ma'lumotlari va status bilan xabarni tahrirlaymiz
+      const emergencyUser = updatedEmergency.user as any;
+      if (!emergencyUser) {
+        throw new Error("Murojaat uchun foydalanuvchi ma'lumotlari topilmadi.");
+      }
 
-        const userInfo = `<b>Foydalanuvchi ma'lumotlari:</b>
+      const userInfo = `<b>Foydalanuvchi ma'lumotlari:</b>
 Ism: ${emergencyUser.full_name}
 Telegram ID: <code>${emergencyUser.telegram_id}</code>
 ${emergencyUser.username ? `Username: @${emergencyUser.username}` : ''}`;
 
-        const messageText = `${updatedEmergency.message_content || ''}`;
-        const fullMessage = `${statusText}
+      const messageText = `${updatedEmergency.message_content || ''}`;
+      const fullMessage = `${statusText}
 
 ${userInfo}
 
 <b>Xabar:</b>
 ${messageText}`;
 
-        if (updatedEmergency.message_type === 'text') {
-          await bot.api.editMessageText(
-            groupId,
-            parseInt(groupMessageId, 10),
-            fullMessage,
-            { parse_mode: 'HTML' },
-          );
-        } else {
-          await bot.api.editMessageCaption(
-            groupId,
-            parseInt(groupMessageId, 10),
-            {
-              caption: fullMessage,
-              parse_mode: 'HTML',
-            },
-          );
-        }
+      if (updatedEmergency.message_type === 'text') {
+        await bot.api.editMessageText(
+          groupId,
+          parseInt(groupMessageId, 10),
+          fullMessage,
+          { parse_mode: 'HTML' },
+        );
+      } else {
+        await bot.api.editMessageCaption(
+          groupId,
+          parseInt(groupMessageId, 10),
+          {
+            caption: fullMessage,
+            parse_mode: 'HTML',
+          },
+        );
       }
 
       await ctx.answerCallbackQuery({
