@@ -42,6 +42,7 @@ export const startCommand = (bot: Bot, userService: UserService) => {
     console.log('Welcome message sent.');
     updatedUser.action = 'awaiting_emergency_message';
     await updatedUser.save();
-    await ctx.reply('Iltimos, xabaringizni yuboring (matn, rasm, video va hokazo).');
+    const sentMessage = await ctx.reply('Iltimos, xabaringizni yuboring (matn, rasm, video va hokazo).');
+    updatedUser.action_message_id = sentMessage.message_id;
   });
 };

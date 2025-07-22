@@ -13,6 +13,14 @@ export const handleEmergencyMessage = async (
   const user = await userService.findOne(ctx.from.id);
 
   if (user && user.action === 'awaiting_emergency_message') {
+      // Delete previous bot message if exists
+      if (user.action_message_id) {
+        try {
+          await bot.api.deleteMessage(ctx.chat.id, user.action_message_id);
+        } catch (error) {
+          console.error('Failed to delete previous bot message:', error);
+        }
+      }
     const groupId = process.env.GROUP_ID;
     if (!groupId) {
       await ctx.reply('Xatolik yuz berdi. Iltimos, keyinroq urinib koʻring.');

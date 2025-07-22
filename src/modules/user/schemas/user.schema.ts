@@ -32,6 +32,9 @@ export class User {
 
   @Prop({ type: String, default: null })
   action: string;
+
+  @Prop({ type: Number, default: null })
+  action_message_id: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

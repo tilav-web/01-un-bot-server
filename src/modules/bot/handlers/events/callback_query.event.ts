@@ -145,7 +145,8 @@ export const callbackQueryEvent = (
       // Reprompt user for new message
       user.action = 'awaiting_emergency_message';
       await userService.update(user.telegram_id, { action: 'awaiting_emergency_message' });
-      await ctx.reply('Iltimos, keyingi xabaringizni yuboring (matn, rasm, video va hokazo).');
+      const sentMessage = await ctx.reply('Iltimos, keyingi xabaringizni yuboring (matn, rasm, video va hokazo).');
+      await userService.update(user.telegram_id, { action_message_id: sentMessage.message_id });
     } catch (error) {
       console.error('Callback query xatoligi:', error);
       await ctx.answerCallbackQuery({
