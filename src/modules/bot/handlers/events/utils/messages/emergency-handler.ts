@@ -33,9 +33,7 @@ export const handleEmergencyMessage = async (
     const userInfo = `<b>Foydalanuvchi ma'lumotlari:</b>
 Ism: ${user.full_name}
 Telegram ID: <code>${user.telegram_id}</code>
-${user.username ? `Username: @${user.username}` : ''}
-
-<b>Xabar:</b>`;
+${user.username ? `Username: @${user.username}` : ''}`;
 
     let sentMessageInGroup;
     let messageType: string | undefined;
@@ -46,9 +44,7 @@ ${user.username ? `Username: @${user.username}` : ''}
       messageContent = ctx.message.text;
       sentMessageInGroup = await bot.api.sendMessage(
         groupId,
-        `${userInfo}
-
-${ctx.message.text}`,
+        `${userInfo}\n\n<b>Xabar:</b>\n${ctx.message.text}`,
         { parse_mode: 'HTML' },
       );
     } else if (ctx.message.photo) {
@@ -58,9 +54,7 @@ ${ctx.message.text}`,
         groupId,
         ctx.message.photo[ctx.message.photo.length - 1].file_id,
         {
-          caption: `${userInfo}
-
-${ctx.message.caption || ''}`,
+          caption: `${userInfo}\n\n<b>Xabar:</b>\n${ctx.message.caption || ''}`,
           parse_mode: 'HTML',
         },
       );
@@ -71,9 +65,7 @@ ${ctx.message.caption || ''}`,
         groupId,
         ctx.message.video.file_id,
         {
-          caption: `${userInfo}
-
-${ctx.message.caption || ''}`,
+          caption: `${userInfo}\n\n<b>Xabar:</b>\n${ctx.message.caption || ''}`,
           parse_mode: 'HTML',
         },
       );
@@ -84,9 +76,7 @@ ${ctx.message.caption || ''}`,
         groupId,
         ctx.message.document.file_id,
         {
-          caption: `${userInfo}
-
-${ctx.message.caption || ''}`,
+          caption: `${userInfo}\n\n<b>Xabar:</b>\n${ctx.message.caption || ''}`,
           parse_mode: 'HTML',
         },
       );
@@ -97,9 +87,7 @@ ${ctx.message.caption || ''}`,
         groupId,
         ctx.message.audio.file_id,
         {
-          caption: `${userInfo}
-
-${ctx.message.caption || ''}`,
+          caption: `${userInfo}\n\n<b>Xabar:</b>\n${ctx.message.caption || ''}`,
           parse_mode: 'HTML',
         },
       );
@@ -110,9 +98,7 @@ ${ctx.message.caption || ''}`,
         groupId,
         ctx.message.voice.file_id,
         {
-          caption: `${userInfo}
-
-${ctx.message.caption || ''}`,
+          caption: `${userInfo}\n\n<b>Xabar:</b>\n${ctx.message.caption || ''}`,
           parse_mode: 'HTML',
         },
       );
@@ -123,9 +109,7 @@ ${ctx.message.caption || ''}`,
         groupId,
         ctx.message.animation.file_id,
         {
-          caption: `${userInfo}
-
-${ctx.message.caption || ''}`,
+          caption: `${userInfo}\n\n<b>Xabar:</b>\n${ctx.message.caption || ''}`,
           parse_mode: 'HTML',
         },
       );
@@ -135,9 +119,7 @@ ${ctx.message.caption || ''}`,
       messageContent = `Foydalanuvchi ${ctx.message.type} turidagi xabar yubordi.`;
       sentMessageInGroup = await bot.api.sendMessage(
         groupId,
-        `${userInfo}
-
-${messageContent}`,
+        `${userInfo}\n\n<b>Xabar:</b>\n${messageContent}`,
         { parse_mode: 'HTML' },
       );
     }

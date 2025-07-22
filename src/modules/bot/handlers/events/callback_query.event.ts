@@ -73,21 +73,21 @@ export const callbackQueryEvent = (
         const userInfo = `<b>Foydalanuvchi ma'lumotlari:</b>
 Ism: ${emergencyUser.full_name}
 Telegram ID: <code>${emergencyUser.telegram_id}</code>
-${emergencyUser.username ? `Username: @${emergencyUser.username}` : ''}
-`;
+${emergencyUser.username ? `Username: @${emergencyUser.username}` : ''}`;
 
-        const messageText = `
-${statusText}
+        const messageText = `${updatedEmergency.message_content || ''}`;
+        const fullMessage = `${statusText}
 
-${updatedEmergency.message_content || ''}`;
+${userInfo}
+
+<b>Xabar:</b>
+${messageText}`;
 
         if (updatedEmergency.message_type === 'text') {
           await bot.api.editMessageText(
             groupId,
             parseInt(groupMessageId, 10),
-            `${userInfo}
-<b>Xabar:</b>
-${messageText}`,
+            fullMessage,
             { parse_mode: 'HTML' },
           );
         } else {
@@ -95,9 +95,7 @@ ${messageText}`,
             groupId,
             parseInt(groupMessageId, 10),
             {
-              caption: `${userInfo}
-<b>Xabar:</b>
-${messageText}`,
+              caption: fullMessage,
               parse_mode: 'HTML',
             },
           );

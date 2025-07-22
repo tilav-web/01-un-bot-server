@@ -41,15 +41,18 @@ export class EmergencyService {
     }
 
     if (search) {
-      const users = await this.emergencyModel.db.collection('users').find({
-        $or: [
-          { full_name: { $regex: search, $options: 'i' } },
-          { username: { $regex: search, $options: 'i' } },
-          { telegram_id: isNaN(Number(search)) ? undefined : Number(search) },
-        ].filter(Boolean),
-      }).toArray();
+      const users = await this.emergencyModel.db
+        .collection('users')
+        .find({
+          $or: [
+            { full_name: { $regex: search, $options: 'i' } },
+            { username: { $regex: search, $options: 'i' } },
+            { telegram_id: isNaN(Number(search)) ? undefined : Number(search) },
+          ].filter(Boolean),
+        })
+        .toArray();
 
-      const userIds = users.map(user => user._id);
+      const userIds = users.map((user) => user._id);
 
       query.$or = [
         { user: { $in: userIds } },
@@ -72,9 +75,15 @@ export class EmergencyService {
 
   async getStatistics(): Promise<any> {
     const totalEmergencies = await this.emergencyModel.countDocuments().exec();
-    const confirmedEmergencies = await this.emergencyModel.countDocuments({ status: EmergencyStatus.CONFIRMED }).exec();
-    const canceledEmergencies = await this.emergencyModel.countDocuments({ status: EmergencyStatus.CANCELED }).exec();
-    const pendingEmergencies = await this.emergencyModel.countDocuments({ status: EmergencyStatus.PENDING }).exec();
+    const confirmedEmergencies = await this.emergencyModel
+      .countDocuments({ status: EmergencyStatus.CONFIRMED })
+      .exec();
+    const canceledEmergencies = await this.emergencyModel
+      .countDocuments({ status: EmergencyStatus.CANCELED })
+      .exec();
+    const pendingEmergencies = await this.emergencyModel
+      .countDocuments({ status: EmergencyStatus.PENDING })
+      .exec();
 
     return {
       totalEmergencies,
@@ -84,8 +93,12 @@ export class EmergencyService {
     };
   }
 
-  async findPendingEmergencyByUserId(userId: Types.ObjectId): Promise<EmergencyDocument | null> {
-    return this.emergencyModel.findOne({ user: userId, status: EmergencyStatus.PENDING }).exec();
+  async findPendingEmergencyByUserId(
+    userId: Types.ObjectId,
+  ): Promise<EmergencyDocument | null> {
+    return this.emergencyModel
+      .findOne({ user: userId, status: EmergencyStatus.PENDING })
+      .exec();
   }
 
   async updateEmergencyStatus(
@@ -94,6 +107,7 @@ export class EmergencyService {
   ): Promise<EmergencyDocument | null> {
     return this.emergencyModel
       .findOneAndUpdate({ group_message_id }, { status }, { new: true })
+      .populate('user')
       .exec();
   }
 
