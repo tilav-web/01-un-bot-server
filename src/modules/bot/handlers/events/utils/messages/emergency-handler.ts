@@ -20,8 +20,6 @@ export const handleEmergencyMessage = async (
     return false;
   }
 
-  
-
   // Delete previous bot message if exists (this logic is fine here)
   if (user.action_message_id) {
     try {
@@ -143,8 +141,6 @@ ${user.username ? `Username: @${user.username}` : ''}`;
       message_type: messageType,
       message_content: messageContent,
     });
-
-    
 
     const inlineKeyboard = new InlineKeyboard()
       .text('Tasdiqlash', `confirm_emergency:${sentMessageInGroup.message_id}`)

@@ -64,6 +64,7 @@ export class EmergencyService {
       this.emergencyModel
         .find(query)
         .populate('user')
+        .sort({ _id: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .exec(),
