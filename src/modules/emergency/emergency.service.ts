@@ -102,21 +102,23 @@ export class EmergencyService {
   }
 
   async updateEmergencyStatus(
-    group_message_id: number,
+    id: number,
     status: EmergencyStatus,
   ): Promise<EmergencyDocument | null> {
     return this.emergencyModel
-      .findOneAndUpdate({ group_message_id }, { status }, { new: true })
+      .findByIdAndUpdate(id, { status }, { new: true })
       .populate('user')
       .exec();
   }
 
   async updateEmergencyType(
-    group_message_id: number,
+    id: number,
     type: EmergencyType,
   ): Promise<EmergencyDocument | null> {
+    console.log(id, type);
+
     return this.emergencyModel
-      .findOneAndUpdate({ group_message_id }, { type }, { new: true })
+      .findByIdAndUpdate(id, { type }, { new: true })
       .exec();
   }
 }

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { EmergencyService } from './emergency.service';
 import { CreateEmergencyDto } from './dto/create-emergency.dto';
 import { EmergencyStatus, EmergencyType } from './schemas/emergency.schema';
@@ -28,19 +36,19 @@ export class EmergencyController {
     return this.emergencyService.getStatistics();
   }
 
-  @Patch(':group_message_id')
+  @Patch('status/:id')
   updateEmergencyStatus(
-    @Param('group_message_id') group_message_id: number,
+    @Param('id') id: number,
     @Body('status') status: EmergencyStatus,
   ) {
-    return this.emergencyService.updateEmergencyStatus(group_message_id, status);
+    return this.emergencyService.updateEmergencyStatus(id, status);
   }
 
-  @Patch('type/:group_message_id')
+  @Patch('type/:id')
   updateEmergencyType(
-    @Param('group_message_id') group_message_id: number,
+    @Param('id') id: number,
     @Body('type') type: EmergencyType,
   ) {
-    return this.emergencyService.updateEmergencyType(group_message_id, type);
+    return this.emergencyService.updateEmergencyType(id, type);
   }
 }
