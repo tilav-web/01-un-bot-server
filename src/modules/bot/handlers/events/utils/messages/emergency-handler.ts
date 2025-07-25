@@ -20,16 +20,7 @@ export const handleEmergencyMessage = async (
     return false;
   }
 
-  // Check for pending emergency first, regardless of user.action
-  const pendingEmergency = await emergencyService.findPendingEmergencyByUserId(
-    new Types.ObjectId(user._id.toString()),
-  );
-  if (pendingEmergency) {
-    await ctx.reply(
-      'Sizda hali tasdiqlanmagan xabar bor. Iltimos, avvalgi xabaringizni tasdiqlang yoki bekor qiling.',
-    );
-    return true; // Indicate that the message was handled (by informing about pending)
-  }
+  
 
   // Delete previous bot message if exists (this logic is fine here)
   if (user.action_message_id) {
@@ -153,8 +144,7 @@ ${user.username ? `Username: @${user.username}` : ''}`;
       message_content: messageContent,
     });
 
-    user.action = null;
-    await user.save();
+    
 
     const inlineKeyboard = new InlineKeyboard()
       .text('Tasdiqlash', `confirm_emergency:${sentMessageInGroup.message_id}`)
