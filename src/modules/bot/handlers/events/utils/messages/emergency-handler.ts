@@ -38,7 +38,6 @@ export const handleEmergencyMessage = async (
     } catch (error) {
       console.error('Failed to delete previous bot message:', error);
     }
-    }
     const groupId = process.env.GROUP_ID;
     if (!groupId) {
       await ctx.reply('Xatolik yuz berdi. Iltimos, keyinroq urinib koʻring.');
