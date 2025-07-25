@@ -15,14 +15,29 @@ export const handleEmergencyMessage = async (
 ) => {
   const user = await userService.findOne(ctx.from.id);
 
-  if (user && user.action === 'awaiting_emergency_message') {
-    // Delete previous bot message if exists
-    if (user.action_message_id) {
-      try {
-        await bot.api.deleteMessage(ctx.chat.id, user.action_message_id);
-      } catch (error) {
-        console.error('Failed to delete previous bot message:', error);
-      }
+  if (!user) {
+    // Handle case where user is not found, maybe reply with a message or log
+    return false;
+  }
+
+  // Check for pending emergency first, regardless of user.action
+  const pendingEmergency = await emergencyService.findPendingEmergencyByUserId(
+    new Types.ObjectId(user._id.toString()),
+  );
+  if (pendingEmergency) {
+    await ctx.reply(
+      'Sizda hali tasdiqlanmagan xabar bor. Iltimos, avvalgi xabaringizni tasdiqlang yoki bekor qiling.',
+    );
+    return true; // Indicate that the message was handled (by informing about pending)
+  }
+
+  // Delete previous bot message if exists (this logic is fine here)
+  if (user.action_message_id) {
+    try {
+      await bot.api.deleteMessage(ctx.chat.id, user.action_message_id);
+    } catch (error) {
+      console.error('Failed to delete previous bot message:', error);
+    }
     }
     const groupId = process.env.GROUP_ID;
     if (!groupId) {
