@@ -10,10 +10,22 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const createdUser = new this.userModel(createUserDto);
-    return createdUser.save();
+    try {
+      const savedUser = await createdUser.save();
+      console.log('User created successfully:', savedUser);
+      return savedUser;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
   }
 
-  async findAll(page: number = 1, limit: number = 10, search?: string, status?: UserStatus): Promise<{ users: UserDocument[]; total: number }> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+    status?: UserStatus,
+  ): Promise<{ users: UserDocument[]; total: number }> {
     const query: any = {};
     if (search) {
       query.$or = [
@@ -39,8 +51,13 @@ export class UserService {
     return this.userModel.findOne({ telegram_id }).exec();
   }
 
-  async update(telegram_id: number, updateData: Partial<User>): Promise<UserDocument | null> {
-    return this.userModel.findOneAndUpdate({ telegram_id }, updateData, { new: true }).exec();
+  async update(
+    telegram_id: number,
+    updateData: Partial<User>,
+  ): Promise<UserDocument | null> {
+    return this.userModel
+      .findOneAndUpdate({ telegram_id }, updateData, { new: true })
+      .exec();
   }
 
   async isUserBlocked(telegram_id: number): Promise<boolean> {
@@ -53,7 +70,9 @@ export class UserService {
   }
 
   async findActiveUsersByIds(ids: string[]): Promise<UserDocument[]> {
-    const objectIds = ids.map(id => new Types.ObjectId(id));
-    return this.userModel.find({ _id: { $in: objectIds }, status: UserStatus.ACTIVE }).exec();
+    const objectIds = ids.map((id) => new Types.ObjectId(id));
+    return this.userModel
+      .find({ _id: { $in: objectIds }, status: UserStatus.ACTIVE })
+      .exec();
   }
 }
