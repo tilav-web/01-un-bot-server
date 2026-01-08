@@ -7,11 +7,13 @@ import { BotService } from './modules/bot/bot.service';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { GroupModule } from './modules/group/group.module';
 import { MailingModule } from './modules/mailing/mailing.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost:27017/01'),
     BotModule,
+    UserModule,
     EmergencyModule,
     AuthModule,
     StatisticsModule,

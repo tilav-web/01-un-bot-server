@@ -10,14 +10,7 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const createdUser = new this.userModel(createUserDto);
-    try {
-      const savedUser = await createdUser.save();
-      console.log('User created successfully:', savedUser);
-      return savedUser;
-    } catch (error) {
-      console.error('Error creating user:', error);
-      throw error;
-    }
+    return createdUser.save();
   }
 
   async findAll(
